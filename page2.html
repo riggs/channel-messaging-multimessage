@@ -21,14 +21,20 @@
   <script>
   var list = document.querySelector('ul');
 
-  onmessage = function(e) {
-    var listItem = document.createElement('li');
-    listItem.textContent = e.data;
-  	list.appendChild(listItem);
-  	// e.ports[0] is channel.port2, sent from the main frame
-  	e.ports[0].postMessage('Message received by IFrame: "' + e.data + '"');
+  window.onmessage = function(e) {
+
+    // e.ports[0] is channel.port2, sent from the main frame
+    var port2 = e.ports[0];
+
+    function handleMessage(e) {
+      var listItem = document.createElement('li');
+      listItem.textContent = e.data;
+      list.appendChild(listItem);
+      port2.postMessage('Message received by IFrame: "' + e.data + '"');
+    }
+    port2.onmessage = handleMessage;
+
   }
-  
 
   </script>
 </html>

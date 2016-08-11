@@ -31,26 +31,27 @@
 
     var textInput = document.querySelector('.message-box');
     var button = document.querySelector('button');
-    
+
+    function handleMessage(e) {
+      para.innerHTML = e.data;
+      textInput.value = '';
+    }
+
     var ifr = document.querySelector('iframe');
     var otherWindow = ifr.contentWindow;
 
-    ifr.addEventListener("load", iframeLoaded, false);
-    
     function iframeLoaded() {
+
+      var channel = new MessageChannel();
+      channel.port1.onmessage = handleMessage;
+      otherWindow.postMessage("Sending port2 to iframe", '*', [channel.port2]);
+
       button.onclick = function(e) {
         e.preventDefault();
-        
-        var channel = new MessageChannel();
-        otherWindow.postMessage(textInput.value, '*', [channel.port2]);
-
-        channel.port1.onmessage = handleMessage;
-        function handleMessage(e) {
-          para.innerHTML = e.data;
-          textInput.value = '';
-        } 
+        channel.port1.postMessage(textInput.value);
       }
     }
+    ifr.addEventListener("load", iframeLoaded, false);
 
   </script>
 </html>
